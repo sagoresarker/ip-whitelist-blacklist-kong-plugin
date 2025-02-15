@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  kong-database:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+      POSTGRES_PASSWORD: kongpass
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "5433:5432"
+    volumes:
+      - kong_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  kong-migrations:
+    image: kong:latest
+    depends_on:
+      kong-database:
+        condition: service_healthy
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+    command: kong migrations bootstrap
+    restart: on-failure
+
+  kong:
+    build:
+      context: ./plugins/ip-tacker/
+      dockerfile: Dockerfile
+    depends_on:
+      kong-migrations:
+        condition: service_completed_successfully
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_STATUS_LISTEN: 0.0.0.0:8100
+      KONG_ADMIN_GUI_URL: http://localhost:8002
+      KONG_ADMIN_GUI_LISTEN: 0.0.0.0:8002
+      KONG_PLUGINS: bundled,ip-tacker
+      KONG_PLUGINSERVER_NAMES: ip-tacker
+      KONG_PLUGINSERVER_IP_TACKER_START_CMD: /usr/local/kong/plugins/ip-tacker/start
+      KONG_PLUGINSERVER_IP_TACKER_QUERY_CMD: /usr/local/kong/plugins/ip-tacker/query -dump
+    ports:
+      - "8005:8000"
+      - "8006:8001"
+      - "8007:8002"
+      - "8100:8100"
+    volumes:
+      - ./plugins/ip-tacker:/usr/local/kong/plugins/ip-tacker
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: on-failure
+
+volumes:
+  kong_data:
