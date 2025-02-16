@@ -1,12 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/Kong/go-pdk"
@@ -86,25 +84,6 @@ func isIPInList(clientIP string, ipList []string) bool {
 }
 
 func main() {
-	// Check if running in query mode
-	if len(os.Args) > 1 && os.Args[1] == "-dump" {
-		info := map[string]interface{}{
-			"name":     PluginName,
-			"version":  Version,
-			"priority": Priority,
-			"schema":   Schema(),
-		}
-
-		json, err := json.Marshal(info)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error encoding plugin info: %v", err)
-			os.Exit(1)
-		}
-		fmt.Println(string(json))
-		return
-	}
-
-	// Otherwise start the plugin server
 	if err := server.StartServer(New, Version, Priority); err != nil {
 		log.Printf("Error starting server for the plugin: %v,  %v", PluginName, err)
 		panic(err)

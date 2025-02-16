@@ -12,8 +12,9 @@ USER root
 
 RUN mkdir -p /usr/local/kong/plugins/ip-tacker
 
-COPY --from=builder /build/ip-tacker.so /usr/local/kong/plugins/ip-tacker/
+# COPY --from=builder /build/ip-tacker.so /usr/local/kong/plugins/ip-tacker/
 COPY --from=builder /build/ip-tacker-server /usr/local/kong/plugins/ip-tacker/
 
+# RUN rm /usr/local/kong/plugins/ip-tacker/.gitkeep
 
 USER kong

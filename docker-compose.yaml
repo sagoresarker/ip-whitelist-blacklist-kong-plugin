@@ -54,7 +54,7 @@ services:
       KONG_PLUGINS: bundled,ip-tacker
       KONG_PLUGINSERVER_NAMES: ip-tacker
       KONG_PLUGINSERVER_IP_TACKER_START_CMD: /usr/local/kong/plugins/ip-tacker/start
-      KONG_PLUGINSERVER_IP_TACKER_QUERY_CMD: /usr/local/kong/plugins/ip-tacker/query
+      KONG_PLUGINSERVER_IP_TACKER_QUERY_CMD: /usr/local/kong/plugins/ip-tacker/query --dump
     ports:
       - "8005:8000"
       - "8006:8001"
