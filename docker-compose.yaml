@@ -29,7 +29,6 @@ services:
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kongpass
     command: kong migrations bootstrap
-    restart: on-failure
 
   kong:
     build:
@@ -55,20 +54,17 @@ services:
       KONG_PLUGINS: bundled,ip-tacker
       KONG_PLUGINSERVER_NAMES: ip-tacker
       KONG_PLUGINSERVER_IP_TACKER_START_CMD: /usr/local/kong/plugins/ip-tacker/start
-      KONG_PLUGINSERVER_IP_TACKER_QUERY_CMD: /usr/local/kong/plugins/ip-tacker/query -dump
+      KONG_PLUGINSERVER_IP_TACKER_QUERY_CMD: /usr/local/kong/plugins/ip-tacker/query
     ports:
       - "8005:8000"
       - "8006:8001"
       - "8007:8002"
       - "8100:8100"
-    volumes:
-      - ./plugins/ip-tacker:/usr/local/kong/plugins/ip-tacker
     healthcheck:
       test: ["CMD", "kong", "health"]
       interval: 10s
       timeout: 10s
       retries: 5
-    restart: on-failure
 
 volumes:
   kong_data:

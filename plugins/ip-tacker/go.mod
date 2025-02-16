@@ -1,6 +1,6 @@
 module github.com/sagoresarker/access-control-kong-plugin
 
-go 1.23
+go 1.21
 
 require github.com/Kong/go-pdk v0.11.0
 
