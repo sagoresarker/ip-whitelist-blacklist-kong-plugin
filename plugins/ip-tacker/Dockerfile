@@ -3,8 +3,8 @@ FROM golang:1.21 AS builder
 WORKDIR /build
 COPY . .
 RUN go mod download
-RUN CGO_ENABLED=1 GOOS=linux go build -buildmode=plugin -o ip-tacker.so main.go
-RUN CGO_ENABLED=1 GOOS=linux go build -o ip-tacker-server main.go
+# Build a static Linux binary for the plugin server
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags='-s -w' -o ip-tacker main.go
 
 FROM kong:latest
 
@@ -12,9 +12,6 @@ USER root
 
 RUN mkdir -p /usr/local/kong/plugins/ip-tacker
 
-# COPY --from=builder /build/ip-tacker.so /usr/local/kong/plugins/ip-tacker/
-COPY --from=builder /build/ip-tacker-server /usr/local/kong/plugins/ip-tacker/
-
-# RUN rm /usr/local/kong/plugins/ip-tacker/.gitkeep
+COPY --from=builder /build/ip-tacker /usr/local/kong/plugins/ip-tacker/
 
 USER kong
