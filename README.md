@@ -1,6 +1,6 @@
-## Issues
+## Issues (fixed in the previous commit)
 
-In this project i implemented a kong plugin which controll the ip whitelisting, blacklisting. But I faced a issue repeatedly and could not manage to solve it properly. 
+In this project i implemented a kong plugin which controll the ip whitelisting, blacklisting. But I faced a issue repeatedly and could not manage to solve it properly.
 
 The issue i faced during the r&d was,
 
@@ -36,5 +36,5 @@ kong-1 exited with code 1
 
 ## How to run this application
 ```sh
-docker compose up 
+docker compose up
 ```
